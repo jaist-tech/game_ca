@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cell Battle - ライフゲーム対戦</title>
+    <script src="optimized_patterns.js"></script>
     <style>
         * {
             margin: 0;
@@ -73,14 +74,14 @@
             color: #fff;
         }
 
-        .territory-label.player-a {
+        .territory-label.cpu {
             top: 10px;
-            background: rgba(52, 152, 219, 0.9);
+            background: rgba(231, 76, 60, 0.9);
         }
 
-        .territory-label.player-b {
+        .territory-label.user {
             bottom: 10px;
-            background: rgba(231, 76, 60, 0.9);
+            background: rgba(52, 152, 219, 0.9);
         }
 
         .controls {
@@ -156,40 +157,6 @@
             padding-bottom: 10px;
             border-bottom: 2px solid #ecf0f1;
             color: #2c3e50;
-        }
-
-        .player-select {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .player-btn {
-            flex: 1;
-            padding: 15px;
-            border: 3px solid transparent;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: #fff;
-        }
-
-        .player-btn.player-a {
-            background: rgba(52, 152, 219, 0.6);
-        }
-
-        .player-btn.player-a.active {
-            border-color: #3498db;
-            background: rgba(52, 152, 219, 0.9);
-        }
-
-        .player-btn.player-b {
-            background: rgba(231, 76, 60, 0.6);
-        }
-
-        .player-btn.player-b.active {
-            border-color: #e74c3c;
-            background: rgba(231, 76, 60, 0.9);
         }
 
         /* タブUI */
@@ -328,12 +295,12 @@
             color: #495057;
         }
 
-        .stat-value.player-a-color {
-            color: #3498db;
+        .stat-value.cpu-color {
+            color: #e74c3c;
         }
 
-        .stat-value.player-b-color {
-            color: #e74c3c;
+        .stat-value.user-color {
+            color: #3498db;
         }
 
         .cell-count {
@@ -348,12 +315,12 @@
             border-radius: 3px;
         }
 
-        .cell-indicator.player-a {
-            background: #3498db;
+        .cell-indicator.cpu {
+            background: #e74c3c;
         }
 
-        .cell-indicator.player-b {
-            background: #e74c3c;
+        .cell-indicator.user {
+            background: #3498db;
         }
 
         .settings {
@@ -377,14 +344,14 @@
             accent-color: #3498db;
         }
 
-        .setting-row input[type="number"] {
-            width: 60px;
-            padding: 5px;
+        .setting-row select {
+            padding: 8px 12px;
             border: 1px solid #ced4da;
             border-radius: 5px;
             background: #fff;
             color: #495057;
-            text-align: center;
+            font-size: 0.9rem;
+            cursor: pointer;
         }
 
         .game-message {
@@ -418,11 +385,11 @@
             margin-bottom: 15px;
         }
 
-        .game-message.player-a-win h2 {
+        .game-message.user-win h2 {
             color: #3498db;
         }
 
-        .game-message.player-b-win h2 {
+        .game-message.cpu-win h2 {
             color: #e74c3c;
         }
 
@@ -501,11 +468,259 @@
         .overlay.active {
             display: block;
         }
+
+        /* CPUセクション */
+        .cpu-section {
+            background: #ffebee;
+            border: 2px solid #ef9a9a;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+
+        .cpu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .cpu-label {
+            font-weight: bold;
+            color: #c62828;
+        }
+
+        .cpu-status {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .btn-edit-cpu {
+            padding: 6px 12px;
+            background: #ef5350;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-edit-cpu:hover {
+            background: #e53935;
+        }
+
+        .btn-edit-cpu.active {
+            background: #c62828;
+        }
+
+        /* CPU編集パネル */
+        .cpu-edit-panel {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #ef9a9a;
+        }
+
+        .cpu-edit-panel select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ef9a9a;
+            border-radius: 5px;
+            background: #fff;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+        }
+
+        .pattern-buttons {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .btn-preset {
+            flex: 1;
+            padding: 8px 10px;
+            font-size: 0.8rem;
+            background: linear-gradient(135deg, #ef5350, #e53935);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-preset:hover {
+            background: linear-gradient(135deg, #e53935, #c62828);
+            transform: translateY(-1px);
+        }
+
+        /* USERセクション */
+        .user-section {
+            background: #e3f2fd;
+            border: 2px solid #90caf9;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 15px;
+        }
+
+        .user-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .user-label {
+            font-weight: bold;
+            color: #1565c0;
+        }
+
+        .user-status {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .btn-user-preset {
+            padding: 6px 12px;
+            background: #42a5f5;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-user-preset:hover {
+            background: #1e88e5;
+        }
+
+        .btn-user-preset.active {
+            background: #1565c0;
+        }
+
+        /* USER編集パネル */
+        .user-edit-panel {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #90caf9;
+        }
+
+        .user-edit-panel select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #90caf9;
+            border-radius: 5px;
+            background: #fff;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+        }
+
+        .btn-user-apply {
+            flex: 1;
+            padding: 8px 10px;
+            font-size: 0.8rem;
+            background: linear-gradient(135deg, #42a5f5, #1e88e5);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-user-apply:hover {
+            background: linear-gradient(135deg, #1e88e5, #1565c0);
+            transform: translateY(-1px);
+        }
+
+        .btn-close-panel {
+            width: 100%;
+            margin-top: 10px;
+            padding: 8px;
+            background: #9e9e9e;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-close-panel:hover {
+            background: #757575;
+        }
+
+        /* パターン配置セクション */
+        .placement-section {
+            margin-top: 15px;
+        }
+
+        /* 手動配置ボタン */
+        .btn-manual-edit {
+            width: 100%;
+            padding: 8px;
+            margin-top: 8px;
+            background: linear-gradient(135deg, #78909c, #546e7a);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-manual-edit:hover {
+            background: linear-gradient(135deg, #546e7a, #37474f);
+            transform: translateY(-1px);
+        }
+
+        /* CPU手動配置パネル */
+        .cpu-manual-panel {
+            background: #ffebee;
+            border: 2px solid #ef9a9a;
+            border-radius: 10px;
+            padding: 12px;
+            margin: 10px 0;
+        }
+
+        .cpu-manual-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #c62828;
+        }
+
+        .btn-back-to-user {
+            padding: 6px 12px;
+            background: #42a5f5;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-back-to-user:hover {
+            background: #1e88e5;
+        }
+
+        .cpu-tabs {
+            margin-bottom: 10px;
+        }
+
+        .cpu-manual-panel .pattern-library {
+            min-height: 120px;
+        }
+
+        .cpu-manual-panel .rotation-info {
+            margin-bottom: 0;
+        }
     </style>
 </head>
 <body>
     <h1>Cell Battle</h1>
-    <p class="subtitle">ライフゲーム対戦</p>
+    <p class="subtitle">ライフゲーム対戦 vs CPU</p>
 
     <div class="game-container">
         <div class="side-panel">
@@ -513,27 +728,75 @@
                 配置フェーズ
             </div>
 
-            <h3 class="panel-title">プレイヤー選択</h3>
-            <div class="player-select">
-                <button class="player-btn player-a active" id="btnPlayerA" onclick="selectPlayer('A')">
-                    Player A<br><small>(上陣地)</small>
-                </button>
-                <button class="player-btn player-b" id="btnPlayerB" onclick="selectPlayer('B')">
-                    Player B<br><small>(下陣地)</small>
-                </button>
+            <!-- CPUセクション -->
+            <div class="cpu-section">
+                <div class="cpu-header">
+                    <span class="cpu-label">CPU</span>
+                    <span class="cpu-status" id="cpuStatus">自動配置済み</span>
+                </div>
+                <button class="btn-edit-cpu" id="btnEditCpu" onclick="toggleCpuEdit()">編集する</button>
+
+                <!-- CPU編集パネル（通常は非表示） -->
+                <div class="cpu-edit-panel" id="cpuEditPanel" style="display: none;">
+                    <select id="cpuPattern" onchange="onCpuPatternSelect()">
+                        <option value="">-- プリセット選択 --</option>
+                    </select>
+                    <button class="btn-manual-edit" onclick="startCpuManualEdit()">手動配置</button>
+                    <button class="btn-close-panel" onclick="toggleCpuEdit()">閉じる</button>
+                </div>
             </div>
 
-            <h3 class="panel-title">パターン</h3>
-            <div class="pattern-tabs" id="patternTabs">
-                <button class="tab-btn active" data-category="still">静物</button>
-                <button class="tab-btn" data-category="oscillator">振動子</button>
-                <button class="tab-btn" data-category="spaceship">移動体</button>
-                <button class="tab-btn" data-category="other">その他</button>
+            <!-- CPU手動配置パネル（通常は非表示） -->
+            <div class="cpu-manual-panel" id="cpuManualPanel" style="display: none;">
+                <div class="cpu-manual-header">
+                    <span>CPU 手動配置モード</span>
+                    <button class="btn-back-to-user" onclick="endCpuManualEdit()">閉じる</button>
+                </div>
+                <div class="pattern-tabs cpu-tabs" id="cpuPatternTabs">
+                    <button class="tab-btn" data-category="single" onclick="setCpuCategory('single')">1マス</button>
+                    <button class="tab-btn active" data-category="still" onclick="setCpuCategory('still')">静物</button>
+                    <button class="tab-btn" data-category="oscillator" onclick="setCpuCategory('oscillator')">振動子</button>
+                    <button class="tab-btn" data-category="spaceship" onclick="setCpuCategory('spaceship')">移動体</button>
+                    <button class="tab-btn" data-category="other" onclick="setCpuCategory('other')">その他</button>
+                </div>
+                <div class="pattern-library" id="cpuPatternLibrary"></div>
+                <div class="rotation-info">
+                    <kbd>R</kbd> キーで回転 | 現在: <span id="cpuRotationAngle">0°</span>
+                </div>
             </div>
-            <div class="pattern-library" id="patternLibrary"></div>
 
-            <div class="rotation-info">
-                <kbd>R</kbd> キーで回転 | 現在: <span id="rotationAngle">0°</span>
+            <!-- USERセクション -->
+            <div class="user-section">
+                <div class="user-header">
+                    <span class="user-label">USER（あなた）</span>
+                    <span class="user-status" id="userStatus">手動配置</span>
+                </div>
+                <button class="btn-user-preset" id="btnUserPreset" onclick="toggleUserPreset()">プリセットを使う</button>
+
+                <!-- USERプリセットパネル（通常は非表示） -->
+                <div class="user-edit-panel" id="userPresetPanel" style="display: none;">
+                    <select id="userPattern" onchange="onUserPatternSelect()">
+                        <option value="">-- プリセット選択 --</option>
+                    </select>
+                    <button class="btn-close-panel" onclick="toggleUserPreset()">閉じる</button>
+                </div>
+            </div>
+
+            <!-- USERパターン配置 -->
+            <div class="placement-section" id="userPlacementSection">
+                <h3 class="panel-title">パターン配置</h3>
+                <div class="pattern-tabs" id="patternTabs">
+                    <button class="tab-btn" data-category="single">1マス</button>
+                    <button class="tab-btn active" data-category="still">静物</button>
+                    <button class="tab-btn" data-category="oscillator">振動子</button>
+                    <button class="tab-btn" data-category="spaceship">移動体</button>
+                    <button class="tab-btn" data-category="other">その他</button>
+                </div>
+                <div class="pattern-library" id="patternLibrary"></div>
+
+                <div class="rotation-info">
+                    <kbd>R</kbd> キーで回転 | 現在: <span id="rotationAngle">0°</span>
+                </div>
             </div>
 
             <div class="stats">
@@ -544,20 +807,20 @@
                 <div class="stat-row">
                     <span class="stat-label">
                         <span class="cell-count">
-                            <span class="cell-indicator player-a"></span>
-                            Player A
+                            <span class="cell-indicator cpu"></span>
+                            CPU
                         </span>
                     </span>
-                    <span class="stat-value player-a-color" id="cellCountA">0</span>
+                    <span class="stat-value cpu-color" id="cellCountCpu">0</span>
                 </div>
                 <div class="stat-row">
                     <span class="stat-label">
                         <span class="cell-count">
-                            <span class="cell-indicator player-b"></span>
-                            Player B
+                            <span class="cell-indicator user"></span>
+                            USER
                         </span>
                     </span>
-                    <span class="stat-value player-b-color" id="cellCountB">0</span>
+                    <span class="stat-value user-color" id="cellCountUser">0</span>
                 </div>
                 <div class="stat-row">
                     <span class="stat-label">配置可能</span>
@@ -567,17 +830,21 @@
 
             <div class="settings">
                 <div class="setting-row">
-                    <label>グリッドサイズ (n)</label>
-                    <input type="number" id="gridSize" value="20" min="10" max="40">
+                    <label>陣地サイズ</label>
+                    <select id="gridSize">
+                        <option value="20">20×20</option>
+                        <option value="25">25×25</option>
+                        <option value="30">30×30</option>
+                    </select>
                 </div>
                 <div class="setting-row">
                     <label>速度 (ms)</label>
-                    <input type="range" id="speed" min="50" max="500" value="150">
+                    <input type="range" id="speed" min="10" max="500" value="150">
                 </div>
             </div>
 
             <div class="instructions">
-                <strong>操作:</strong> クリックで選択→盤面クリックで配置<br>
+                <strong>操作:</strong> パターン選択→USER陣地をクリックで配置<br>
                 <strong>回転:</strong> <kbd>R</kbd>キー | <strong>解除:</strong> <kbd>ESC</kbd>キー<br>
                 <strong>勝利:</strong> 相手陣地の最奥に到達<br>
                 <strong>終了時:</strong> 侵攻度(到達段)→セル数の順で判定
@@ -587,14 +854,14 @@
         <div class="main-panel">
             <div class="canvas-container" id="canvasContainer">
                 <canvas id="gameCanvas"></canvas>
-                <div class="territory-label player-a">Player A 陣地</div>
-                <div class="territory-label player-b">Player B 陣地</div>
+                <div class="territory-label cpu">CPU 陣地</div>
+                <div class="territory-label user">USER 陣地</div>
             </div>
             <div class="controls">
                 <button class="btn-start" id="btnStart" onclick="startGame()">開始</button>
                 <button class="btn-stop" id="btnStop" onclick="stopGame()" disabled>停止</button>
                 <button class="btn-step" id="btnStep" onclick="stepGame()">1ステップ</button>
-                <button class="btn-clear" id="btnClear" onclick="clearBoard()">クリア</button>
+                <button class="btn-clear" id="btnClear" onclick="clearUserCells()">USERクリア</button>
                 <button class="btn-reset" id="btnReset" onclick="resetGame()">リセット</button>
             </div>
         </div>
@@ -614,24 +881,30 @@
     <script>
         // ゲーム状態
         const EMPTY = 0;
-        const PLAYER_A = 1;
-        const PLAYER_B = 2;
+        const CPU = 1;    // 上側（旧PLAYER_A）
+        const USER = 2;   // 下側（旧PLAYER_B）
 
         // 色定義
         const COLORS = {
             [EMPTY]: '#ffffff',
-            [PLAYER_A]: '#3498db',
-            [PLAYER_B]: '#e74c3c',
+            [CPU]: '#e74c3c',   // CPUは赤
+            [USER]: '#3498db',  // USERは青
             gridLine: '#dee2e6',
-            territoryA: 'rgba(52, 152, 219, 0.08)',
-            territoryB: 'rgba(231, 76, 60, 0.08)',
-            goalLineA: 'rgba(52, 152, 219, 0.25)',
-            goalLineB: 'rgba(231, 76, 60, 0.25)',
+            territoryCpu: 'rgba(231, 76, 60, 0.08)',
+            territoryUser: 'rgba(52, 152, 219, 0.08)',
+            goalLineCpu: 'rgba(231, 76, 60, 0.25)',
+            goalLineUser: 'rgba(52, 152, 219, 0.25)',
         };
 
         // パターン定義（カテゴリ別）
         const PATTERNS = {
-            // 静物 (Still lifes)
+            single: {
+                name: '1マス',
+                category: 'single',
+                cells: [[0,0]],
+                width: 1,
+                height: 1
+            },
             block: {
                 name: 'ブロック',
                 category: 'still',
@@ -667,7 +940,6 @@
                 width: 3,
                 height: 3
             },
-            // 振動子 (Oscillators)
             blinker: {
                 name: 'ブリンカー',
                 category: 'oscillator',
@@ -707,7 +979,6 @@
                 width: 13,
                 height: 13
             },
-            // 移動体 (Spaceships)
             glider: {
                 name: 'グライダー',
                 category: 'spaceship',
@@ -729,7 +1000,6 @@
                 width: 5,
                 height: 6
             },
-            // その他 (Methuselahs)
             rpentomino: {
                 name: 'Rペントミノ',
                 category: 'other',
@@ -758,9 +1028,9 @@
         let gridWidth, gridHeight;
         let cellSize = 20;
         let grid = [];
-        let prevGrid = []; // 安定判定用
-        let gridHistory = new Map(); // 周期検出用（ハッシュ -> ステップ番号）
-        let currentPlayer = PLAYER_A;
+        let prevGrid = [];
+        let gridHistory = new Map();
+        let currentPlayer = USER;  // デフォルトはUSER（下側）
         let gamePhase = 'setup';
         let animationId = null;
         let stepCount = 0;
@@ -774,7 +1044,10 @@
         let dragGhost = null;
         let ghostCanvas = null;
         let currentCategory = 'still';
-        let rotationAngle = 0; // 0, 90, 180, 270
+        let rotationAngle = 0;
+
+        // 最適化パターンデータ
+        let optimizedPatternsData = null;
 
         // 初期化
         function init() {
@@ -789,6 +1062,18 @@
             setupEventListeners();
             render();
             updateStats();
+
+            // 最適化パターンデータを読み込み
+            loadOptimizedPatternsData();
+
+            // USER編集モードで初期化
+            document.getElementById('cpuManualPanel').style.display = 'none';
+            document.getElementById('userPlacementSection').style.display = 'block';
+
+            // CPUにのみランダムプリセットを配置
+            setTimeout(() => {
+                loadRandomCpuPattern();
+            }, 100);
         }
 
         // グリッドのセットアップ
@@ -803,7 +1088,7 @@
 
             grid = [];
             prevGrid = [];
-            gridHistory = new Map(); // 履歴をリセット
+            gridHistory = new Map();
             for (let y = 0; y < gridHeight; y++) {
                 grid[y] = [];
                 prevGrid[y] = [];
@@ -817,15 +1102,241 @@
             updateStats();
         }
 
-        // 盤面をハッシュ文字列に変換
-        function gridToHash() {
-            let hash = '';
-            for (let y = 0; y < gridHeight; y++) {
+        // 最適化パターンを読み込み
+        function loadOptimizedPatternsData() {
+            const n = parseInt(document.getElementById('gridSize').value);
+
+            if (typeof OPTIMIZED_PATTERNS !== 'undefined' && OPTIMIZED_PATTERNS[n]) {
+                optimizedPatternsData = OPTIMIZED_PATTERNS[n];
+
+                // CPU用セレクトボックスを更新
+                const cpuSelect = document.getElementById('cpuPattern');
+                cpuSelect.innerHTML = '<option value="">-- 選択 --</option>';
+                optimizedPatternsData.patterns.forEach((pattern, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = `プリセット${index + 1}`;
+                    cpuSelect.appendChild(option);
+                });
+
+                // USER用セレクトボックスを更新
+                const userSelect = document.getElementById('userPattern');
+                userSelect.innerHTML = '<option value="">-- 選択 --</option>';
+                optimizedPatternsData.patterns.forEach((pattern, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = `プリセット${index + 1}`;
+                    userSelect.appendChild(option);
+                });
+
+                console.log(`N=${n}の最適化パターン(${optimizedPatternsData.patterns.length}個)を読み込みました`);
+            } else {
+                console.warn('最適化パターンが見つかりません: N=' + n);
+                optimizedPatternsData = null;
+            }
+        }
+
+        // CPU編集パネルの切り替え
+        function toggleCpuEdit() {
+            const panel = document.getElementById('cpuEditPanel');
+            const btn = document.getElementById('btnEditCpu');
+            const isVisible = panel.style.display !== 'none';
+
+            panel.style.display = isVisible ? 'none' : 'block';
+            btn.classList.toggle('active', !isVisible);
+            btn.textContent = isVisible ? '編集する' : '編集中...';
+        }
+
+        // USERプリセットパネルの切り替え
+        function toggleUserPreset() {
+            const panel = document.getElementById('userPresetPanel');
+            const btn = document.getElementById('btnUserPreset');
+            const isVisible = panel.style.display !== 'none';
+
+            panel.style.display = isVisible ? 'none' : 'block';
+            btn.classList.toggle('active', !isVisible);
+            btn.textContent = isVisible ? 'プリセットを使う' : '選択中...';
+        }
+
+        // CPUプリセット選択時に即時反映
+        function onCpuPatternSelect() {
+            const select = document.getElementById('cpuPattern');
+            const patternIndex = select.value;
+
+            if (patternIndex === '' || !optimizedPatternsData) return;
+
+            const n = parseInt(document.getElementById('gridSize').value);
+
+            // CPU陣地をクリア
+            for (let y = 0; y < n; y++) {
                 for (let x = 0; x < gridWidth; x++) {
-                    hash += grid[y][x];
+                    grid[y][x] = EMPTY;
                 }
             }
-            return hash;
+
+            const pattern = optimizedPatternsData.patterns[parseInt(patternIndex)];
+            pattern.cells.forEach(([x, y]) => {
+                if (x >= 0 && x < gridWidth && y >= 0 && y < n) {
+                    grid[y][x] = CPU;
+                }
+            });
+
+            document.getElementById('cpuStatus').textContent = `プリセット${parseInt(patternIndex) + 1}`;
+            render();
+            updateStats();
+        }
+
+        // USERプリセット選択時に即時反映
+        function onUserPatternSelect() {
+            const select = document.getElementById('userPattern');
+            const patternIndex = select.value;
+
+            if (patternIndex === '' || !optimizedPatternsData) return;
+
+            const n = parseInt(document.getElementById('gridSize').value);
+
+            // USER陣地をクリア
+            for (let y = n; y < gridHeight; y++) {
+                for (let x = 0; x < gridWidth; x++) {
+                    grid[y][x] = EMPTY;
+                }
+            }
+
+            const pattern = optimizedPatternsData.patterns[parseInt(patternIndex)];
+            pattern.cells.forEach(([x, y]) => {
+                const mirroredY = gridHeight - 1 - y;
+                if (x >= 0 && x < gridWidth && mirroredY >= n && mirroredY < gridHeight) {
+                    grid[mirroredY][x] = USER;
+                }
+            });
+
+            document.getElementById('userStatus').textContent = `プリセット${parseInt(patternIndex) + 1}`;
+            render();
+            updateStats();
+        }
+
+        // CPU手動配置モードを開始
+        function startCpuManualEdit() {
+            currentPlayer = CPU;
+            document.getElementById('cpuManualPanel').style.display = 'block';
+            document.getElementById('userPlacementSection').style.display = 'none';
+            setupCpuPatternLibrary();
+        }
+
+        // CPU手動配置モードを終了してUSER編集に戻る
+        function endCpuManualEdit() {
+            currentPlayer = USER;
+            document.getElementById('cpuManualPanel').style.display = 'none';
+            document.getElementById('userPlacementSection').style.display = 'block';
+            setupPatternLibrary();
+        }
+
+        // CPU用カテゴリ切り替え
+        function setCpuCategory(category) {
+            currentCategory = category;
+            const tabs = document.querySelectorAll('#cpuPatternTabs .tab-btn');
+            tabs.forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.category === category);
+            });
+            setupCpuPatternLibrary();
+        }
+
+        // CPU用パターンライブラリのセットアップ
+        function setupCpuPatternLibrary() {
+            const library = document.getElementById('cpuPatternLibrary');
+            library.innerHTML = '';
+
+            const filteredPatterns = Object.entries(PATTERNS)
+                .filter(([_, pattern]) => pattern.category === currentCategory);
+
+            for (const [key, pattern] of filteredPatterns) {
+                const item = document.createElement('div');
+                item.className = 'pattern-item';
+                item.dataset.pattern = key;
+
+                const preview = document.createElement('div');
+                preview.className = 'pattern-preview';
+
+                const previewCanvas = document.createElement('canvas');
+                const rotated = rotatePattern(pattern.cells, pattern.width, pattern.height, rotationAngle);
+                const size = Math.max(rotated.width, rotated.height);
+                const previewCellSize = Math.min(Math.floor(55 / size), 12);
+                previewCanvas.width = rotated.height * previewCellSize;
+                previewCanvas.height = rotated.width * previewCellSize;
+
+                const pctx = previewCanvas.getContext('2d');
+                pctx.fillStyle = '#f8f9fa';
+                pctx.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
+
+                pctx.fillStyle = COLORS[CPU];
+                for (const [row, col] of rotated.cells) {
+                    pctx.fillRect(col * previewCellSize, row * previewCellSize,
+                                  previewCellSize - 1, previewCellSize - 1);
+                }
+
+                preview.appendChild(previewCanvas);
+
+                const name = document.createElement('div');
+                name.className = 'pattern-name';
+                name.textContent = pattern.name;
+
+                item.appendChild(preview);
+                item.appendChild(name);
+                library.appendChild(item);
+
+                item.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    selectPatternItem(key, item);
+                });
+
+                item.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    startDrag(key, e);
+                });
+            }
+
+            if (selectedPattern) {
+                const item = library.querySelector(`[data-pattern="${selectedPattern}"]`);
+                if (item) item.classList.add('selected');
+            }
+
+            // 回転角度を更新
+            document.getElementById('cpuRotationAngle').textContent = rotationAngle + '°';
+        }
+
+        // CPUにランダムプリセットを配置
+        function loadRandomCpuPattern() {
+            if (!optimizedPatternsData || !optimizedPatternsData.patterns) {
+                console.warn('最適化パターンが読み込まれていません');
+                return;
+            }
+
+            const n = parseInt(document.getElementById('gridSize').value);
+
+            // CPU陣地（上側）をクリア
+            for (let y = 0; y < n; y++) {
+                for (let x = 0; x < gridWidth; x++) {
+                    grid[y][x] = EMPTY;
+                }
+            }
+
+            // ランダムにパターンを選択
+            const randomIndex = Math.floor(Math.random() * optimizedPatternsData.patterns.length);
+            const pattern = optimizedPatternsData.patterns[randomIndex];
+
+            // セレクトボックスを更新
+            document.getElementById('cpuPattern').value = randomIndex;
+
+            // CPUに配置（上側、上下反転なし）
+            pattern.cells.forEach(([x, y]) => {
+                if (x >= 0 && x < gridWidth && y >= 0 && y < n) {
+                    grid[y][x] = CPU;
+                }
+            });
+
+            document.getElementById('cpuStatus').textContent = `プリセット${randomIndex + 1}`;
+            render();
+            updateStats();
         }
 
         // タブのセットアップ
@@ -858,7 +1369,6 @@
                 }
             });
 
-            // 座標を正規化（最小値を0に）
             let minRow = Math.min(...rotatedCells.map(c => c[0]));
             let minCol = Math.min(...rotatedCells.map(c => c[1]));
             rotatedCells = rotatedCells.map(([r, c]) => [r - minRow, c - minCol]);
@@ -896,7 +1406,8 @@
                 pctx.fillStyle = '#f8f9fa';
                 pctx.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
 
-                pctx.fillStyle = currentPlayer === PLAYER_A ? COLORS[PLAYER_A] : COLORS[PLAYER_B];
+                // USERの色（青）で表示
+                pctx.fillStyle = COLORS[USER];
                 for (const [row, col] of rotated.cells) {
                     pctx.fillRect(col * previewCellSize, row * previewCellSize,
                                   previewCellSize - 1, previewCellSize - 1);
@@ -923,7 +1434,6 @@
                 });
             }
 
-            // 選択状態を復元
             if (selectedPattern) {
                 const item = document.querySelector(`[data-pattern="${selectedPattern}"]`);
                 if (item) item.classList.add('selected');
@@ -979,7 +1489,7 @@
             gctx.fillStyle = '#ffffff';
             gctx.fillRect(0, 0, ghostCanvas.width, ghostCanvas.height);
 
-            gctx.fillStyle = currentPlayer === PLAYER_A ? COLORS[PLAYER_A] : COLORS[PLAYER_B];
+            gctx.fillStyle = COLORS[currentPlayer];
             for (const [row, col] of rotated.cells) {
                 gctx.fillRect(
                     col * ghostCellSize + 1,
@@ -1055,14 +1565,6 @@
                 }
             });
 
-            document.getElementById('gridSize').addEventListener('change', () => {
-                if (gamePhase === 'setup') {
-                    setupGrid();
-                    render();
-                }
-            });
-
-            // キーボードイベント
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
                     selectedPattern = null;
@@ -1072,7 +1574,6 @@
                     ghostPosition = null;
                     render();
                 } else if (e.key === 'r' || e.key === 'R') {
-                    // 回転
                     rotationAngle = (rotationAngle + 90) % 360;
                     document.getElementById('rotationAngle').textContent = rotationAngle + '°';
                     setupPatternLibrary();
@@ -1082,6 +1583,8 @@
                     render();
                 }
             });
+
+            document.getElementById('gridSize').addEventListener('change', onGridSizeChange);
         }
 
         // キャンバスクリック処理
@@ -1093,6 +1596,8 @@
             const y = Math.floor((e.clientY - rect.top) / cellSize);
 
             if (!isValidPosition(x, y)) return;
+
+            // currentPlayerの陣地のみ配置可能
             if (!isInTerritory(x, y, currentPlayer)) return;
 
             if (selectedPattern) {
@@ -1102,6 +1607,7 @@
                 return;
             }
 
+            // 単一セルの配置/削除
             if (grid[y][x] === currentPlayer) {
                 grid[y][x] = EMPTY;
             } else if (grid[y][x] === EMPTY) {
@@ -1111,6 +1617,12 @@
                 }
             }
 
+            // ステータス更新
+            if (currentPlayer === USER) {
+                document.getElementById('userStatus').textContent = '手動配置';
+            } else {
+                document.getElementById('cpuStatus').textContent = '手動配置';
+            }
             render();
             updateStats();
         }
@@ -1159,6 +1671,12 @@
                 grid[y][x] = currentPlayer;
             }
 
+            // ステータス更新
+            if (currentPlayer === USER) {
+                document.getElementById('userStatus').textContent = '手動配置';
+            } else {
+                document.getElementById('cpuStatus').textContent = '手動配置';
+            }
             updateStats();
         }
 
@@ -1170,10 +1688,10 @@
         // 陣地内かチェック
         function isInTerritory(x, y, player) {
             const midY = gridHeight / 2;
-            if (player === PLAYER_A) {
-                return y < midY;
+            if (player === CPU) {
+                return y < midY;  // CPU = 上側
             } else {
-                return y >= midY;
+                return y >= midY; // USER = 下側
             }
         }
 
@@ -1197,18 +1715,22 @@
             ctx.fillStyle = '#fff';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            ctx.fillStyle = COLORS.territoryA;
+            // CPU陣地（上側）
+            ctx.fillStyle = COLORS.territoryCpu;
             ctx.fillRect(0, 0, gridWidth * cellSize, midY * cellSize);
 
-            ctx.fillStyle = COLORS.territoryB;
+            // USER陣地（下側）
+            ctx.fillStyle = COLORS.territoryUser;
             ctx.fillRect(0, midY * cellSize, gridWidth * cellSize, midY * cellSize);
 
-            ctx.fillStyle = COLORS.goalLineA;
+            // ゴールライン
+            ctx.fillStyle = COLORS.goalLineCpu;
             ctx.fillRect(0, 0, gridWidth * cellSize, cellSize);
 
-            ctx.fillStyle = COLORS.goalLineB;
+            ctx.fillStyle = COLORS.goalLineUser;
             ctx.fillRect(0, (gridHeight - 1) * cellSize, gridWidth * cellSize, cellSize);
 
+            // グリッド線
             ctx.strokeStyle = COLORS.gridLine;
             ctx.lineWidth = 0.5;
 
@@ -1226,6 +1748,7 @@
                 ctx.stroke();
             }
 
+            // 中央線
             ctx.strokeStyle = '#adb5bd';
             ctx.lineWidth = 3;
             ctx.beginPath();
@@ -1233,6 +1756,7 @@
             ctx.lineTo(gridWidth * cellSize, midY * cellSize);
             ctx.stroke();
 
+            // セル描画
             for (let y = 0; y < gridHeight; y++) {
                 for (let x = 0; x < gridWidth; x++) {
                     if (grid[y][x] !== EMPTY) {
@@ -1264,7 +1788,7 @@
                                         (grid[y][x] === EMPTY || grid[y][x] === currentPlayer);
 
                         ctx.globalAlpha = 0.5;
-                        ctx.fillStyle = canPlace ? COLORS[currentPlayer] : '#e74c3c';
+                        ctx.fillStyle = canPlace ? COLORS[currentPlayer] : '#888';
                         ctx.beginPath();
                         ctx.roundRect(
                             x * cellSize + 2,
@@ -1293,39 +1817,32 @@
 
         // 統計更新
         function updateStats() {
-            const countA = countCells(PLAYER_A);
-            const countB = countCells(PLAYER_B);
+            const countCpuCells = countCells(CPU);
+            const countUserCells = countCells(USER);
 
             document.getElementById('stepCount').textContent = stepCount;
-            document.getElementById('cellCountA').textContent = countA;
-            document.getElementById('cellCountB').textContent = countB;
+            document.getElementById('cellCountCpu').textContent = countCpuCells;
+            document.getElementById('cellCountUser').textContent = countUserCells;
 
             if (gamePhase === 'setup') {
-                const remaining = currentPlayer === PLAYER_A
-                    ? maxCellsPerPlayer - countA
-                    : maxCellsPerPlayer - countB;
+                // 現在編集中のプレイヤーの残りセル数を表示
+                const targetCount = currentPlayer === USER ? countUserCells : countCpuCells;
+                const remaining = maxCellsPerPlayer - targetCount;
                 document.getElementById('remainingCells').textContent = remaining;
             } else {
                 document.getElementById('remainingCells').textContent = '-';
             }
         }
 
-        // プレイヤー選択
-        function selectPlayer(player) {
-            if (gamePhase !== 'setup') return;
-
-            currentPlayer = player === 'A' ? PLAYER_A : PLAYER_B;
-
-            document.getElementById('btnPlayerA').classList.toggle('active', currentPlayer === PLAYER_A);
-            document.getElementById('btnPlayerB').classList.toggle('active', currentPlayer === PLAYER_B);
-
-            selectedPattern = null;
-            document.querySelectorAll('.pattern-item').forEach(el => {
-                el.classList.remove('selected');
-            });
-
-            setupPatternLibrary();
-            updateStats();
+        // 盤面をハッシュ文字列に変換
+        function gridToHash() {
+            let hash = '';
+            for (let y = 0; y < gridHeight; y++) {
+                for (let x = 0; x < gridWidth; x++) {
+                    hash += grid[y][x];
+                }
+            }
+            return hash;
         }
 
         // ゲーム開始
@@ -1338,12 +1855,10 @@
                 el.classList.remove('selected');
             });
 
-            // 履歴をクリアして初期盤面を追加
             gridHistory = new Map();
             const initialHash = gridToHash();
             gridHistory.set(initialHash, 0);
 
-            // 前のグリッドを初期化
             for (let y = 0; y < gridHeight; y++) {
                 for (let x = 0; x < gridWidth; x++) {
                     prevGrid[y][x] = grid[y][x];
@@ -1387,12 +1902,10 @@
                 updatePhaseIndicator();
                 document.getElementById('gridSize').disabled = true;
 
-                // 履歴をクリアして初期盤面を追加
                 gridHistory = new Map();
                 const initialHash = gridToHash();
                 gridHistory.set(initialHash, 0);
 
-                // 前のグリッドを初期化
                 for (let y = 0; y < gridHeight; y++) {
                     for (let x = 0; x < gridWidth; x++) {
                         prevGrid[y][x] = grid[y][x];
@@ -1430,11 +1943,9 @@
 
         // グリッド更新
         function updateGrid() {
-            // 現在の盤面をハッシュ化して履歴に保存
             const currentHash = gridToHash();
             gridHistory.set(currentHash, stepCount);
 
-            // 前のグリッドを保存
             for (let y = 0; y < gridHeight; y++) {
                 for (let x = 0; x < gridWidth; x++) {
                     prevGrid[y][x] = grid[y][x];
@@ -1457,8 +1968,8 @@
         // 次の状態を計算
         function calculateNextState(x, y) {
             const currentState = grid[y][x];
-            let countA = 0;
-            let countB = 0;
+            let countCpuNeighbors = 0;
+            let countUserNeighbors = 0;
 
             for (let dy = -1; dy <= 1; dy++) {
                 for (let dx = -1; dx <= 1; dx++) {
@@ -1468,25 +1979,25 @@
                     const ny = y + dy;
 
                     if (isValidPosition(nx, ny)) {
-                        if (grid[ny][nx] === PLAYER_A) countA++;
-                        else if (grid[ny][nx] === PLAYER_B) countB++;
+                        if (grid[ny][nx] === CPU) countCpuNeighbors++;
+                        else if (grid[ny][nx] === USER) countUserNeighbors++;
                     }
                 }
             }
 
-            const totalNeighbors = countA + countB;
+            const totalNeighbors = countCpuNeighbors + countUserNeighbors;
 
             if (currentState === EMPTY) {
                 if (totalNeighbors === 3) {
-                    if (countA > countB) return PLAYER_A;
-                    if (countB > countA) return PLAYER_B;
+                    if (countCpuNeighbors > countUserNeighbors) return CPU;
+                    if (countUserNeighbors > countCpuNeighbors) return USER;
                     return EMPTY;
                 }
                 return EMPTY;
             } else {
                 if (totalNeighbors === 2 || totalNeighbors === 3) {
-                    if (countA > countB) return PLAYER_A;
-                    if (countB > countA) return PLAYER_B;
+                    if (countCpuNeighbors > countUserNeighbors) return CPU;
+                    if (countUserNeighbors > countCpuNeighbors) return USER;
                     return currentState;
                 }
                 return EMPTY;
@@ -1505,121 +2016,107 @@
             return true;
         }
 
-        // 侵攻度を計算（相手陣地への到達段数）
-        // Player A: 下方向に進む。最大y座標が大きいほど侵攻度が高い
-        // Player B: 上方向に進む。最小y座標が小さいほど侵攻度が高い
+        // 侵攻度を計算
         function getAdvancement(player) {
             const midY = gridHeight / 2;
 
-            if (player === PLAYER_A) {
-                // Aの最前線（最大y座標）を見つける
+            if (player === CPU) {
+                // CPUは下方向に進む
                 let maxY = -1;
                 for (let y = 0; y < gridHeight; y++) {
                     for (let x = 0; x < gridWidth; x++) {
-                        if (grid[y][x] === PLAYER_A) {
+                        if (grid[y][x] === CPU) {
                             maxY = Math.max(maxY, y);
                         }
                     }
                 }
-                // 侵攻度: 自陣の下端（midY-1）から何段進んだか
-                // maxY = midY なら侵攻度1（相手陣地に1段入った）
-                // maxY = gridHeight-1 なら最大侵攻度
-                if (maxY === -1) return -999; // セルが無い
+                if (maxY === -1) return -999;
                 return maxY - (midY - 1);
             } else {
-                // Bの最前線（最小y座標）を見つける
+                // USERは上方向に進む
                 let minY = gridHeight;
                 for (let y = 0; y < gridHeight; y++) {
                     for (let x = 0; x < gridWidth; x++) {
-                        if (grid[y][x] === PLAYER_B) {
+                        if (grid[y][x] === USER) {
                             minY = Math.min(minY, y);
                         }
                     }
                 }
-                // 侵攻度: 自陣の上端（midY）から何段進んだか
-                // minY = midY-1 なら侵攻度1（相手陣地に1段入った）
-                // minY = 0 なら最大侵攻度
-                if (minY === gridHeight) return -999; // セルが無い
+                if (minY === gridHeight) return -999;
                 return midY - minY;
             }
         }
 
         // 到達段数とセル数で勝敗を判定
         function judgeByAdvancementAndCells(reason) {
-            const advA = getAdvancement(PLAYER_A);
-            const advB = getAdvancement(PLAYER_B);
-            const countA = countCells(PLAYER_A);
-            const countB = countCells(PLAYER_B);
+            const advCpu = getAdvancement(CPU);
+            const advUser = getAdvancement(USER);
+            const countCpuCells = countCells(CPU);
+            const countUserCells = countCells(USER);
 
-            // まず到達段数で比較
-            if (advA > advB) {
-                endGame('A', `${reason} - 侵攻度勝利 (A:${advA}段 vs B:${advB}段)`);
+            if (advUser > advCpu) {
+                endGame('USER', `${reason} - 侵攻度勝利 (USER:${advUser}段 vs CPU:${advCpu}段)`);
                 return;
             }
-            if (advB > advA) {
-                endGame('B', `${reason} - 侵攻度勝利 (A:${advA}段 vs B:${advB}段)`);
+            if (advCpu > advUser) {
+                endGame('CPU', `${reason} - 侵攻度勝利 (CPU:${advCpu}段 vs USER:${advUser}段)`);
                 return;
             }
 
-            // 同じ段の場合はセル数で比較
-            if (countA > countB) {
-                endGame('A', `${reason} - 同段階でセル数勝利 (${advA}段, A:${countA} vs B:${countB})`);
-            } else if (countB > countA) {
-                endGame('B', `${reason} - 同段階でセル数勝利 (${advB}段, A:${countA} vs B:${countB})`);
+            if (countUserCells > countCpuCells) {
+                endGame('USER', `${reason} - 同段階でセル数勝利 (${advUser}段, USER:${countUserCells} vs CPU:${countCpuCells})`);
+            } else if (countCpuCells > countUserCells) {
+                endGame('CPU', `${reason} - 同段階でセル数勝利 (${advCpu}段, CPU:${countCpuCells} vs USER:${countUserCells})`);
             } else {
-                endGame('draw', `${reason} - 完全同点 (${advA}段, ${countA}セル)`);
+                endGame('draw', `${reason} - 完全同点 (${advUser}段, ${countUserCells}セル)`);
             }
         }
 
         // 勝利判定
         function checkWinCondition() {
-            // Player Aの勝利チェック（最下段にAのセルがある）
-            let aWins = false;
+            // CPUの勝利チェック（最下段にCPUのセルがある）
+            let cpuWins = false;
             for (let x = 0; x < gridWidth; x++) {
-                if (grid[gridHeight - 1][x] === PLAYER_A) {
-                    aWins = true;
+                if (grid[gridHeight - 1][x] === CPU) {
+                    cpuWins = true;
                     break;
                 }
             }
 
-            // Player Bの勝利チェック（最上段にBのセルがある）
-            let bWins = false;
+            // USERの勝利チェック（最上段にUSERのセルがある）
+            let userWins = false;
             for (let x = 0; x < gridWidth; x++) {
-                if (grid[0][x] === PLAYER_B) {
-                    bWins = true;
+                if (grid[0][x] === USER) {
+                    userWins = true;
                     break;
                 }
             }
 
-            // 同時到達は引き分け
-            if (aWins && bWins) {
+            if (cpuWins && userWins) {
                 endGame('draw', '両者同時に相手陣地の最奥に到達');
                 return true;
             }
 
-            if (aWins) {
-                endGame('A', '相手陣地の最奥に到達');
+            if (userWins) {
+                endGame('USER', '相手陣地の最奥に到達');
                 return true;
             }
 
-            if (bWins) {
-                endGame('B', '相手陣地の最奥に到達');
+            if (cpuWins) {
+                endGame('CPU', '相手陣地の最奥に到達');
                 return true;
             }
 
-            // 最大ステップ数チェック
             if (stepCount >= 1000) {
                 judgeByAdvancementAndCells('最大ステップ到達');
                 return true;
             }
 
-            // 安定状態チェック（前ステップと同じ）
             if (stepCount > 1 && isStable()) {
                 judgeByAdvancementAndCells('盤面安定');
                 return true;
             }
 
-            // 周期検出（過去と同じ盤面が出現）
             const currentHash = gridToHash();
             if (gridHistory.has(currentHash)) {
                 const previousStep = gridHistory.get(currentHash);
@@ -1629,8 +2126,19 @@
             }
 
             // 両者全滅
-            if (countCells(PLAYER_A) === 0 && countCells(PLAYER_B) === 0) {
+            if (countCells(CPU) === 0 && countCells(USER) === 0) {
                 endGame('draw', '両者全滅');
+                return true;
+            }
+
+            // 片方全滅 → もう片方の勝利
+            if (countCells(CPU) === 0) {
+                endGame('USER', 'CPUが全滅');
+                return true;
+            }
+
+            if (countCells(USER) === 0) {
+                endGame('CPU', 'USERが全滅');
                 return true;
             }
 
@@ -1653,12 +2161,12 @@
             if (winner === 'draw') {
                 messageEl.classList.add('draw');
                 titleEl.textContent = '引き分け';
-            } else if (winner === 'A') {
-                messageEl.classList.add('player-a-win');
-                titleEl.textContent = 'Player A 勝利!';
+            } else if (winner === 'USER') {
+                messageEl.classList.add('user-win');
+                titleEl.textContent = 'あなたの勝利!';
             } else {
-                messageEl.classList.add('player-b-win');
-                titleEl.textContent = 'Player B 勝利!';
+                messageEl.classList.add('cpu-win');
+                titleEl.textContent = 'CPUの勝利...';
             }
 
             textEl.textContent = `${stepCount}ステップ - ${reason}`;
@@ -1667,16 +2175,18 @@
             messageEl.style.display = 'block';
         }
 
-        // ボードクリア
-        function clearBoard() {
+        // USERセルのみクリア
+        function clearUserCells() {
             if (gamePhase !== 'setup') return;
 
-            for (let y = 0; y < gridHeight; y++) {
+            const n = parseInt(document.getElementById('gridSize').value);
+            for (let y = n; y < gridHeight; y++) {
                 for (let x = 0; x < gridWidth; x++) {
                     grid[y][x] = EMPTY;
                 }
             }
 
+            document.getElementById('userStatus').textContent = '手動配置';
             render();
             updateStats();
         }
@@ -1699,10 +2209,28 @@
                 el.classList.remove('selected');
             });
 
+            // パネルを閉じる
+            document.getElementById('cpuEditPanel').style.display = 'none';
+            document.getElementById('btnEditCpu').textContent = '編集する';
+            document.getElementById('btnEditCpu').classList.remove('active');
+
+            document.getElementById('userPresetPanel').style.display = 'none';
+            document.getElementById('btnUserPreset').textContent = 'プリセットを使う';
+            document.getElementById('btnUserPreset').classList.remove('active');
+
+            // USER編集モードに戻す
+            currentPlayer = USER;
+            document.getElementById('cpuManualPanel').style.display = 'none';
+            document.getElementById('userPlacementSection').style.display = 'block';
+
             setupGrid();
             setupPatternLibrary();
             updatePhaseIndicator();
             render();
+
+            // CPUにのみランダムプリセットを配置
+            loadRandomCpuPattern();
+            document.getElementById('userStatus').textContent = '手動配置';
         }
 
         // フェーズ表示更新
@@ -1723,6 +2251,27 @@
                     indicator.classList.add('ended');
                     indicator.textContent = 'ゲーム終了';
                     break;
+            }
+        }
+
+        // グリッドサイズ変更時
+        function onGridSizeChange() {
+            if (gamePhase === 'setup') {
+                // USER編集モードに戻す
+                currentPlayer = USER;
+                document.getElementById('cpuManualPanel').style.display = 'none';
+                document.getElementById('userPlacementSection').style.display = 'block';
+
+                setupGrid();
+                loadOptimizedPatternsData();
+                setupPatternLibrary();
+                render();
+
+                // CPUにのみランダムプリセットを配置
+                setTimeout(() => {
+                    loadRandomCpuPattern();
+                    document.getElementById('userStatus').textContent = '手動配置';
+                }, 50);
             }
         }
 

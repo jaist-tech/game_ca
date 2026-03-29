@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Cell Battle - ライフゲーム対戦</title>
     <script src="optimized_patterns.js"></script>
     <style>
@@ -247,25 +247,51 @@
             color: #495057;
         }
 
-        /* 回転インジケータ */
-        .rotation-info {
+        /* 回転コントロール */
+        .rotation-control {
             background: #e8f4f8;
             border: 1px solid #bee5eb;
             border-radius: 6px;
             padding: 10px;
             margin-bottom: 15px;
-            text-align: center;
-            font-size: 0.9rem;
-            color: #0c5460;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
-        .rotation-info kbd {
-            background: #fff;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            padding: 2px 6px;
-            font-family: monospace;
+        .rotation-control span {
+            color: #0c5460;
+            font-size: 0.9rem;
+        }
+
+        .btn-rotate {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
             font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-rotate:hover {
+            background: linear-gradient(135deg, #138496, #117a8b);
+            transform: translateY(-1px);
+        }
+
+        .btn-rotate:active {
+            transform: translateY(0);
+        }
+
+        .rotate-icon {
+            display: inline-block;
+            transition: transform 0.3s ease;
         }
 
         .stats {
@@ -713,8 +739,166 @@
             min-height: 120px;
         }
 
-        .cpu-manual-panel .rotation-info {
+        .cpu-manual-panel .rotation-control {
             margin-bottom: 0;
+        }
+
+        /* スマホ向けレスポンシブデザイン */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+                margin-bottom: 5px;
+            }
+
+            .subtitle {
+                font-size: 0.9rem;
+                margin-bottom: 15px;
+            }
+
+            .game-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .main-panel {
+                order: 0;
+                width: 100%;
+            }
+
+            .side-panel {
+                order: 1;
+                min-width: auto;
+                max-width: 100%;
+                width: 100%;
+                padding: 15px;
+            }
+
+            .canvas-container {
+                border-width: 2px;
+            }
+
+            .territory-label {
+                font-size: 0.75rem;
+                padding: 3px 10px;
+            }
+
+            .controls {
+                margin-top: 15px;
+                gap: 8px;
+            }
+
+            button {
+                padding: 12px 16px;
+                font-size: 0.9rem;
+            }
+
+            .pattern-tabs {
+                gap: 4px;
+            }
+
+            .tab-btn {
+                padding: 6px 10px;
+                font-size: 0.8rem;
+            }
+
+            .pattern-library {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+                min-height: 120px;
+            }
+
+            .pattern-item {
+                padding: 8px;
+            }
+
+            .pattern-preview {
+                width: 50px;
+                height: 50px;
+                margin-bottom: 5px;
+            }
+
+            .pattern-name {
+                font-size: 0.75rem;
+            }
+
+            .stats {
+                padding: 12px;
+            }
+
+            .stat-row {
+                padding: 6px 0;
+                font-size: 0.9rem;
+            }
+
+            .setting-row {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .setting-row label {
+                flex: 1;
+            }
+
+            .setting-row input[type="range"] {
+                width: 120px;
+            }
+
+            .instructions {
+                font-size: 0.75rem;
+                padding: 10px;
+            }
+
+            .game-message {
+                padding: 30px 40px;
+                width: 90%;
+                max-width: 320px;
+            }
+
+            .game-message h2 {
+                font-size: 1.8rem;
+            }
+
+            .btn-rotate {
+                padding: 10px 20px;
+                font-size: 1rem;
+            }
+
+            .cpu-section,
+            .user-section {
+                padding: 10px;
+            }
+
+            .btn-edit-cpu,
+            .btn-user-preset {
+                padding: 8px 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .controls {
+                flex-wrap: wrap;
+            }
+
+            .controls button {
+                flex: 1 1 45%;
+                min-width: 0;
+            }
+
+            .pattern-library {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .setting-row select {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -760,8 +944,11 @@
                     <button class="tab-btn" data-category="other" onclick="setCpuCategory('other')">その他</button>
                 </div>
                 <div class="pattern-library" id="cpuPatternLibrary"></div>
-                <div class="rotation-info">
-                    <kbd>R</kbd> キーで回転 | 現在: <span id="cpuRotationAngle">0°</span>
+                <div class="rotation-control">
+                    <button class="btn-rotate" onclick="rotatePatternCpu()">
+                        <span class="rotate-icon">↻</span> 回転
+                    </button>
+                    <span>現在: <strong id="cpuRotationAngle">0°</strong></span>
                 </div>
             </div>
 
@@ -794,8 +981,11 @@
                 </div>
                 <div class="pattern-library" id="patternLibrary"></div>
 
-                <div class="rotation-info">
-                    <kbd>R</kbd> キーで回転 | 現在: <span id="rotationAngle">0°</span>
+                <div class="rotation-control">
+                    <button class="btn-rotate" onclick="rotatePatternUser()">
+                        <span class="rotate-icon">↻</span> 回転
+                    </button>
+                    <span>現在: <strong id="rotationAngle">0°</strong></span>
                 </div>
             </div>
 
@@ -844,8 +1034,8 @@
             </div>
 
             <div class="instructions">
-                <strong>操作:</strong> パターン選択→USER陣地をクリックで配置<br>
-                <strong>回転:</strong> <kbd>R</kbd>キー | <strong>解除:</strong> <kbd>ESC</kbd>キー<br>
+                <strong>操作:</strong> パターン選択→USER陣地をタップ/クリックで配置<br>
+                <strong>回転:</strong> 回転ボタン or <kbd>R</kbd>キー<br>
                 <strong>勝利:</strong> 相手陣地の最奥に到達<br>
                 <strong>終了時:</strong> 侵攻度(到達段)→セル数の順で判定
             </div>
@@ -1027,6 +1217,7 @@
         let canvas, ctx;
         let gridWidth, gridHeight;
         let cellSize = 20;
+        let baseCellSize = 20; // 基準セルサイズ
         let grid = [];
         let prevGrid = [];
         let gridHistory = new Map();
@@ -1045,6 +1236,10 @@
         let ghostCanvas = null;
         let currentCategory = 'still';
         let rotationAngle = 0;
+
+        // タッチ関連
+        let touchStartPos = null;
+        let isTouchDragging = false;
 
         // 最適化パターンデータ
         let optimizedPatternsData = null;
@@ -1076,12 +1271,33 @@
             }, 100);
         }
 
+        // セルサイズの計算（レスポンシブ対応）
+        function calculateCellSize(n) {
+            const containerPadding = 40; // 左右のパディング
+            const maxWidth = window.innerWidth - containerPadding;
+            const maxHeight = window.innerHeight * 0.6; // 画面高さの60%まで
+
+            // 横幅ベースで計算
+            const cellByWidth = Math.floor(maxWidth / n);
+            // 縦幅ベースで計算（縦は2倍のグリッド）
+            const cellByHeight = Math.floor(maxHeight / (n * 2));
+
+            // 最小値を採用、ただし最小8px、最大25px
+            let size = Math.min(cellByWidth, cellByHeight);
+            size = Math.max(8, Math.min(size, 25));
+
+            return size;
+        }
+
         // グリッドのセットアップ
         function setupGrid() {
             const n = parseInt(document.getElementById('gridSize').value) || 20;
             gridWidth = n;
             gridHeight = n * 2;
             maxCellsPerPlayer = Math.floor(n * n / 4);
+
+            // レスポンシブなセルサイズを計算
+            cellSize = calculateCellSize(n);
 
             canvas.width = gridWidth * cellSize;
             canvas.height = gridHeight * cellSize;
@@ -1293,6 +1509,12 @@
                     e.preventDefault();
                     startDrag(key, e);
                 });
+
+                // タッチイベント（スマホ対応）
+                item.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    selectPatternItem(key, item);
+                }, { passive: false });
             }
 
             if (selectedPattern) {
@@ -1432,6 +1654,12 @@
                     e.preventDefault();
                     startDrag(key, e);
                 });
+
+                // タッチイベント（スマホ対応）
+                item.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    selectPatternItem(key, item);
+                }, { passive: false });
             }
 
             if (selectedPattern) {
@@ -1539,6 +1767,7 @@
 
         // イベントリスナーのセットアップ
         function setupEventListeners() {
+            // マウスイベント
             canvas.addEventListener('click', handleCanvasClick);
             canvas.addEventListener('mousemove', handleCanvasMouseMove);
             canvas.addEventListener('mouseleave', () => {
@@ -1547,6 +1776,11 @@
                     render();
                 }
             });
+
+            // タッチイベント
+            canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+            canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+            canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
 
             document.addEventListener('mousemove', (e) => {
                 if (isDragging) {
@@ -1565,6 +1799,13 @@
                 }
             });
 
+            // タッチドラッグ終了
+            document.addEventListener('touchend', (e) => {
+                if (isTouchDragging) {
+                    endTouchDrag(e);
+                }
+            });
+
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
                     selectedPattern = null;
@@ -1574,17 +1815,190 @@
                     ghostPosition = null;
                     render();
                 } else if (e.key === 'r' || e.key === 'R') {
-                    rotationAngle = (rotationAngle + 90) % 360;
-                    document.getElementById('rotationAngle').textContent = rotationAngle + '°';
-                    setupPatternLibrary();
-                    if (isDragging && selectedPattern) {
-                        createDragGhost(selectedPattern);
+                    // 現在のモードに応じて回転
+                    if (currentPlayer === CPU) {
+                        rotatePatternCpu();
+                    } else {
+                        rotatePatternUser();
                     }
-                    render();
                 }
             });
 
             document.getElementById('gridSize').addEventListener('change', onGridSizeChange);
+
+            // ウィンドウリサイズ時の再計算
+            window.addEventListener('resize', debounce(() => {
+                if (gamePhase === 'setup') {
+                    const n = parseInt(document.getElementById('gridSize').value) || 20;
+                    const newCellSize = calculateCellSize(n);
+                    if (newCellSize !== cellSize) {
+                        cellSize = newCellSize;
+                        canvas.width = gridWidth * cellSize;
+                        canvas.height = gridHeight * cellSize;
+                        render();
+                    }
+                }
+            }, 250));
+        }
+
+        // デバウンス関数
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // USER用回転ボタン
+        function rotatePatternUser() {
+            rotationAngle = (rotationAngle + 90) % 360;
+            document.getElementById('rotationAngle').textContent = rotationAngle + '°';
+            setupPatternLibrary();
+            if (isDragging && selectedPattern) {
+                createDragGhost(selectedPattern);
+            }
+            render();
+            // アイコンのアニメーション
+            animateRotateIcon('rotationAngle');
+        }
+
+        // CPU用回転ボタン
+        function rotatePatternCpu() {
+            rotationAngle = (rotationAngle + 90) % 360;
+            document.getElementById('cpuRotationAngle').textContent = rotationAngle + '°';
+            setupCpuPatternLibrary();
+            if (isDragging && selectedPattern) {
+                createDragGhost(selectedPattern);
+            }
+            render();
+            // アイコンのアニメーション
+            animateRotateIcon('cpuRotationAngle');
+        }
+
+        // 回転アイコンのアニメーション
+        function animateRotateIcon(angleElementId) {
+            const control = document.getElementById(angleElementId).closest('.rotation-control');
+            const icon = control.querySelector('.rotate-icon');
+            if (icon) {
+                icon.style.transform = `rotate(${rotationAngle}deg)`;
+            }
+        }
+
+        // タッチ開始
+        function handleTouchStart(e) {
+            if (gamePhase !== 'setup') return;
+            e.preventDefault();
+
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            const x = Math.floor((touch.clientX - rect.left) / cellSize);
+            const y = Math.floor((touch.clientY - rect.top) / cellSize);
+
+            touchStartPos = { x, y, clientX: touch.clientX, clientY: touch.clientY };
+
+            if (selectedPattern) {
+                ghostPosition = { x, y };
+                render();
+            }
+        }
+
+        // タッチ移動
+        function handleTouchMove(e) {
+            if (gamePhase !== 'setup') return;
+            e.preventDefault();
+
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            const x = Math.floor((touch.clientX - rect.left) / cellSize);
+            const y = Math.floor((touch.clientY - rect.top) / cellSize);
+
+            if (selectedPattern) {
+                ghostPosition = { x, y };
+                render();
+            }
+        }
+
+        // タッチ終了
+        function handleTouchEnd(e) {
+            if (gamePhase !== 'setup') return;
+            e.preventDefault();
+
+            if (!touchStartPos) return;
+
+            const touch = e.changedTouches[0];
+            const rect = canvas.getBoundingClientRect();
+            const x = Math.floor((touch.clientX - rect.left) / cellSize);
+            const y = Math.floor((touch.clientY - rect.top) / cellSize);
+
+            if (!isValidPosition(x, y)) {
+                touchStartPos = null;
+                ghostPosition = null;
+                render();
+                return;
+            }
+
+            // currentPlayerの陣地のみ配置可能
+            if (!isInTerritory(x, y, currentPlayer)) {
+                touchStartPos = null;
+                ghostPosition = null;
+                render();
+                return;
+            }
+
+            if (selectedPattern) {
+                placePattern(selectedPattern, x, y);
+            } else {
+                // 単一セルの配置/削除
+                if (grid[y][x] === currentPlayer) {
+                    grid[y][x] = EMPTY;
+                } else if (grid[y][x] === EMPTY) {
+                    const currentCount = countCells(currentPlayer);
+                    if (currentCount < maxCellsPerPlayer) {
+                        grid[y][x] = currentPlayer;
+                    }
+                }
+
+                // ステータス更新
+                if (currentPlayer === USER) {
+                    document.getElementById('userStatus').textContent = '手動配置';
+                } else {
+                    document.getElementById('cpuStatus').textContent = '手動配置';
+                }
+            }
+
+            touchStartPos = null;
+            ghostPosition = null;
+            render();
+            updateStats();
+        }
+
+        // タッチドラッグ終了
+        function endTouchDrag(e) {
+            isTouchDragging = false;
+            dragGhost.style.display = 'none';
+
+            document.querySelectorAll('.pattern-item').forEach(el => {
+                el.classList.remove('dragging');
+            });
+
+            const touch = e.changedTouches[0];
+            const rect = canvas.getBoundingClientRect();
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+
+            if (x >= 0 && x < canvas.width && y >= 0 && y < canvas.height) {
+                const gridX = Math.floor(x / cellSize);
+                const gridY = Math.floor(y / cellSize);
+                placePattern(selectedPattern, gridX, gridY);
+            }
+
+            ghostPosition = null;
+            render();
         }
 
         // キャンバスクリック処理
@@ -2205,6 +2619,11 @@
             selectedPattern = null;
             rotationAngle = 0;
             document.getElementById('rotationAngle').textContent = '0°';
+            document.getElementById('cpuRotationAngle').textContent = '0°';
+            // 回転アイコンもリセット
+            document.querySelectorAll('.rotate-icon').forEach(icon => {
+                icon.style.transform = 'rotate(0deg)';
+            });
             document.querySelectorAll('.pattern-item').forEach(el => {
                 el.classList.remove('selected');
             });
